@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/user.dart';
+import '../screens/user_detail_screen.dart';
 
 class UserTile extends StatelessWidget {
   final User user;
@@ -9,13 +10,16 @@ class UserTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
-        backgroundImage: NetworkImage(user.image),
-      ),
+      leading: CircleAvatar(backgroundImage: NetworkImage(user.image)),
       title: Text(user.fullName),
       subtitle: Text(user.email),
       onTap: () {
-        // Navigate to UserDetailScreen (to be implemented next)
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => UserDetailScreen(user: user),
+          ),
+        );
       },
     );
   }
