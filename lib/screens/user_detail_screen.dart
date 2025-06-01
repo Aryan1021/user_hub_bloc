@@ -4,6 +4,7 @@ import '../models/user.dart';
 import '../models/post.dart';
 import '../models/todo.dart';
 import '../repositories/user_repository.dart';
+import 'create_post_screen.dart';
 
 class UserDetailScreen extends StatefulWidget {
   final User user;
@@ -17,6 +18,7 @@ class UserDetailScreen extends StatefulWidget {
 class _UserDetailScreenState extends State<UserDetailScreen> {
   late Future<List<Post>> _postsFuture;
   late Future<List<Todo>> _todosFuture;
+  final List<Post> _localPosts = [];
 
   @override
   void initState() {
@@ -54,12 +56,13 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   return const SpinKitCircle(color: Colors.blue, size: 40);
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                } else if (!snapshot.hasData) {
                   return const Text('No posts found.');
                 }
 
+                final allPosts = [..._localPosts, ...snapshot.data!];
                 return Column(
-                  children: snapshot.data!
+                  children: allPosts
                       .map((post) => Card(
                     child: ListTile(
                       title: Text(post.title),
@@ -98,6 +101,24 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CreatePostScreen(
+                userId: widget.user.id,
+                onPostCreated: (post) {
+                  setState(() {
+                    _localPosts.insert(0, post);
+                  });
+                },
+              ),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
