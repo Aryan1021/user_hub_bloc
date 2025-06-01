@@ -74,13 +74,7 @@ Make sure a device or emulator is connected.
 
 ## 🔄 Folder Structure
 
-lib/
- ┣ blocs/               # BLoC files (UserBloc)
- ┣ models/              # Data models (User, Post, Todo)
- ┣ repositories/        # API handlers
- ┣ screens/             # UI Screens (User List, Detail, Create Post)
- ┣ widgets/             # Reusable widgets (Tile, Loader, Error)
- ┗ main.dart            # Entry point
+![image](https://github.com/user-attachments/assets/552d5498-4338-438b-98b2-b02d73febb58)
 
 ---
 
@@ -92,16 +86,11 @@ Uses the BLoC (Business Logic Component) pattern:
 
 ---
 
-🌐 API Source
+## 🌐 API Source 
 All data is fetched from DummyJSON API:
 - Users: https://dummyjson.com/users
 - Posts: https://dummyjson.com/posts/user/{userId}
 - Todos: https://dummyjson.com/todos/user/{userId}
-
----
-
-📄 License
-This project is for assessment/demo purposes. Feel free to fork and modify.
 
 ---
 
