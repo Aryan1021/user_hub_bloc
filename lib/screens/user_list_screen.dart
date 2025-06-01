@@ -5,6 +5,9 @@ import '../blocs/user/user_event.dart';
 import '../blocs/user/user_state.dart';
 import '../models/user.dart';
 import '../widgets/user_tile.dart';
+import '../widgets/loading_widget.dart';
+import '../widgets/error_widget.dart';
+import '../main.dart'; // for themeNotifier
 
 class UserListScreen extends StatefulWidget {
   const UserListScreen({super.key});
@@ -47,7 +50,19 @@ class _UserListScreenState extends State<UserListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Users")),
+      appBar: AppBar(
+        title: const Text("Users"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.brightness_6),
+            onPressed: () {
+              themeNotifier.value = themeNotifier.value == ThemeMode.light
+                  ? ThemeMode.dark
+                  : ThemeMode.light;
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
@@ -68,31 +83,39 @@ class _UserListScreenState extends State<UserListScreen> {
             child: BlocBuilder<UserBloc, UserState>(
               builder: (context, state) {
                 if (state is UserLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const LoadingWidget();
                 } else if (state is UserLoaded) {
                   if (state.users.isEmpty) {
                     return const Center(child: Text('No users found.'));
                   }
 
-                  return ListView.builder(
-                    controller: _scrollController,
-                    itemCount: state.hasReachedMax
-                        ? state.users.length
-                        : state.users.length + 1,
-                    itemBuilder: (context, index) {
-                      if (index >= state.users.length) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      }
-
-                      final user = state.users[index];
-                      return UserTile(user: user);
+                  return RefreshIndicator(
+                    onRefresh: () async {
+                      context.read<UserBloc>().add(const FetchUsers(isRefresh: true));
                     },
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: state.hasReachedMax
+                          ? state.users.length
+                          : state.users.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index >= state.users.length) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+                        return UserTile(user: state.users[index]);
+                      },
+                    ),
                   );
                 } else if (state is UserError) {
-                  return Center(child: Text('Error: ${state.message}'));
+                  return ErrorDisplay(
+                    message: state.message,
+                    onRetry: () {
+                      context.read<UserBloc>().add(const FetchUsers(isRefresh: true));
+                    },
+                  );
                 }
 
                 return const SizedBox.shrink();
