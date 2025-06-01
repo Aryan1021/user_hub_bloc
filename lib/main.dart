@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
       valueListenable: themeNotifier,
       builder: (_, ThemeMode currentMode, __) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'User Hub BLoC',
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
